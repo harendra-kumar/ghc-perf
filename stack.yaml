@@ -1,0 +1,6 @@
+#resolver: lts-9.2
+resolver: nightly-2017-09-07
+packages:
+- '.'
+flags: {}
+extra-package-dbs: []
