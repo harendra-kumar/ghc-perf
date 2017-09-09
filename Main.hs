@@ -11,5 +11,6 @@ main = defaultMain [ bench "asyncly-serial" $ nfIO asyncly_basic]
 
 asyncly_basic :: IO Int
 asyncly_basic = do
-    xs <- toList $ (foldr (<>) mempty $ Prelude.map return [1..100000 :: Int])
-    return (Prelude.length xs)
+    xs <- runAsyncT $ do
+             (foldr append (AsyncT $ return 1) $ Prelude.map (AsyncT . return) [1..100000 :: Int])
+    return xs
