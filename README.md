@@ -1,7 +1,14 @@
-* Run `stack bench` to run the `-O2` and `-O0` benchmarks. `-O0` turns out twice as fast
-  as `-O2`
+This is on GHC 8.2.1. Performance with manually inlining a function is more
+than 10% faster compared to factoring out code and using INLINE pragma.
 
-* Run `stack runghc Main.hs` and it turns out to be twice as fast as `-O0`, i.e. 4
-  times faster than `-O2`.
+* `stack bench` for compiler inlined code
 
-This is on GHC 8.2.1
+```
+time                 46.71 ms   (45.53 ms .. 47.79 ms)
+```
+
+* `stack bench --flag ghc-perf:manual` for manually inlined code
+
+```
+time                 39.46 ms   (38.92 ms .. 39.94 ms)
+```
