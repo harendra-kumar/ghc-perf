@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP                       #-}
 {-# LANGUAGE RankNTypes                #-}
 
 module Async where
@@ -31,14 +32,30 @@ instance Monoid (AsyncT m a) where
     mempty = AsyncT $ \_ stp _ -> stp
     mappend = (<>)
 
+{-# INLINE bindWith #-}
+bindWith
+    :: (forall c. AsyncT m c -> AsyncT m c -> AsyncT m c)
+    -> AsyncT m a
+    -> (a -> AsyncT m b)
+    -> AsyncT m b
+bindWith k (AsyncT m) f = AsyncT $ \_ stp yld ->
+    let run x = (runAsyncT x) Nothing stp yld
+        yield a _ Nothing  = run $ f a
+        yield a _ (Just r) = run $ f a `k` (bindWith k r f)
+    in m Nothing stp yield
+
 instance Monad m => Monad (AsyncT m) where
     return a = AsyncT $ \ctx _ yld -> yld a ctx Nothing
 
+#ifdef MANUAL_INLINE
     AsyncT m >>= f = AsyncT $ \_ stp yld ->
         let run x = (runAsyncT x) Nothing stp yld
             yield a _ Nothing  = run $ f a
             yield a _ (Just r) = run $ f a <> (r >>= f)
         in m Nothing stp yield
+#else
+    (>>=) = bindWith (<>)
+#endif
 
 instance Monad m => Functor (AsyncT m) where
     fmap = liftM
