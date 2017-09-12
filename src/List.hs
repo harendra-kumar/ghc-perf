@@ -1,12 +1,10 @@
-{-# LANGUAGE RankNTypes                #-}
+module List where
 
-module Async where
+import Control.Monad  (liftM)
 
-import           Control.Monad               (liftM)
+data List a = Stop | Yield a (List a)
 
-data AsyncT a = Stop | Yield a (AsyncT a)
-
-instance Monoid (AsyncT a) where
+instance Monoid (List a) where
     mempty = Stop
     mappend x y =
         case x of
@@ -14,7 +12,7 @@ instance Monoid (AsyncT a) where
             Yield a r -> Yield a (mappend r y)
 
 -- {-# INLINE toList #-}
-toList :: Monad m => AsyncT a -> m [a]
+toList :: Monad m => List a -> m [a]
 toList m =
     case m of
         Stop -> return []

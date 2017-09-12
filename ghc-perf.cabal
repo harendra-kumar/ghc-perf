@@ -11,7 +11,7 @@ cabal-version:       >= 1.10
 
 library
     hs-source-dirs:    src
-    exposed-modules:   Async
+    exposed-modules:   List
 
     default-language: Haskell2010
     ghc-options:      -Wall -fwarn-identities -fwarn-incomplete-record-updates
